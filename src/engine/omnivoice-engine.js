@@ -1,6 +1,6 @@
-import * as ort from "onnxruntime-web/all";
 import { Tokenizer } from "@huggingface/tokenizers";
 import { buildVirtualAssetUrl } from "./asset-store.js";
+import { loadOrt, ORT_DIST_BASE_URL } from "./onnxruntime-web-runtime.js";
 import { configureOrtWasm } from "./threading.js";
 import { buildOmniVoiceAttentionMask, createPythonRandom, generateOmniVoiceCodes, prepareOmniVoiceInputs } from "./omnivoice-generation.js";
 
@@ -65,6 +65,7 @@ export class OmniVoiceEngine {
     this.sessions = null;
     this.backend = null;
     this.runtime = null;
+    this.ort = null;
   }
 
   async initialize(manifest, { onStatus = () => {}, appBaseUrl = new URL("./", globalThis.location.href).href } = {}) {
@@ -72,9 +73,10 @@ export class OmniVoiceEngine {
     this.manifest = manifest;
     this.runtime = manifest.runtime;
     this.appBaseUrl = appBaseUrl;
-    configureOrtWasm(ort, {
+    this.ort = await loadOrt();
+    configureOrtWasm(this.ort, {
       preferredThreadCount: this.preferredThreadCount,
-      wasmBaseUrl: appBaseUrl,
+      wasmBaseUrl: ORT_DIST_BASE_URL,
     });
 
     const assetRoot = buildVirtualAssetUrl(manifest.id, "", appBaseUrl);
@@ -163,7 +165,7 @@ export class OmniVoiceEngine {
           }));
         }
         try {
-          sessions[name] = await ort.InferenceSession.create(modelUrl, options);
+          sessions[name] = await this.ort.InferenceSession.create(modelUrl, options);
           onStatus({
             phase: "session-ready",
             backend: candidate.label,
@@ -209,32 +211,32 @@ export class OmniVoiceEngine {
 
   async #runBackboneStep({ inputIds, audioMask, attentionMask, attentionMaskType = "int64", attentionMaskShape, batch, codebooks, sequenceLength }) {
     const embeddingsResult = await this.sessions.audioEmbeddings.run({
-      input_ids: new ort.Tensor("int64", inputIds, [batch, codebooks, sequenceLength]),
-      audio_mask: new ort.Tensor("bool", audioMask, [batch, sequenceLength]),
+      input_ids: new this.ort.Tensor("int64", inputIds, [batch, codebooks, sequenceLength]),
+      audio_mask: new this.ort.Tensor("bool", audioMask, [batch, sequenceLength]),
     });
     const embeddings = embeddingsResult.inputs_embeds;
     const llmFeed = {
-      inputs_embeds: new ort.Tensor("float32", tensorToFloat32(embeddings), [batch, sequenceLength, this.runtime.hiddenSize]),
+      inputs_embeds: new this.ort.Tensor("float32", tensorToFloat32(embeddings), [batch, sequenceLength, this.runtime.hiddenSize]),
     };
     const llmInputNames = new Set(this.sessions.llm.inputNames);
     if (llmInputNames.has("attention_mask")) {
-      llmFeed.attention_mask = new ort.Tensor(
+      llmFeed.attention_mask = new this.ort.Tensor(
         attentionMaskType,
         attentionMask,
         attentionMaskShape ?? [batch, sequenceLength]
       );
     }
     if (llmInputNames.has("position_ids")) {
-      llmFeed.position_ids = new ort.Tensor("int64", bigintRange(sequenceLength, batch), [batch, sequenceLength]);
+      llmFeed.position_ids = new this.ort.Tensor("int64", bigintRange(sequenceLength, batch), [batch, sequenceLength]);
     }
     for (const inputName of this.sessions.llm.inputNames) {
       if (!inputName.includes("past")) continue;
-      llmFeed[inputName] = new ort.Tensor("float32", new Float32Array(0), [batch, this.runtime.numKvHeads, 0, this.runtime.headDim]);
+      llmFeed[inputName] = new this.ort.Tensor("float32", new Float32Array(0), [batch, this.runtime.numKvHeads, 0, this.runtime.headDim]);
     }
     const llmResult = await this.sessions.llm.run(llmFeed);
     const hidden = llmResult.hidden_states;
     const headsResult = await this.sessions.audioHeads.run({
-      hidden_states: new ort.Tensor("float32", tensorToFloat32(hidden), [batch, sequenceLength, this.runtime.hiddenSize]),
+      hidden_states: new this.ort.Tensor("float32", tensorToFloat32(hidden), [batch, sequenceLength, this.runtime.hiddenSize]),
     });
     return tensorToFloat32(headsResult.logits);
   }
@@ -243,7 +245,7 @@ export class OmniVoiceEngine {
     const decoderInputName = this.runtime.decoderInputName || "codes";
     const decoderOutputName = this.runtime.decoderOutputName || "waveform_24k";
     const result = await this.sessions.higgsDecoder.run({
-      [decoderInputName]: new ort.Tensor("int64", tokens, [codebooks, 1, targetLength]),
+      [decoderInputName]: new this.ort.Tensor("int64", tokens, [codebooks, 1, targetLength]),
     });
     const waveform = result[decoderOutputName];
     if (!waveform) throw new Error(`Higgs decoder output not found: ${decoderOutputName}`);

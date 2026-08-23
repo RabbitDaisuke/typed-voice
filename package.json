@@ -5,11 +5,9 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "postinstall": "node scripts/patch-onnxruntime-web-f32-accumulate.mjs",
     "prepare:runtime": "node scripts/copy-runtime-assets.mjs",
     "build:kanalizer-wasm": "bash scripts/build-kanalizer-wasm.sh",
     "licenses:kanalizer": "bash scripts/generate-kanalizer-rust-licenses.sh",
-    "build:piper-wasm": "bash scripts/build-piper-wasm.sh",
     "dev": "npm run prepare:runtime && vite",
     "build": "npm run prepare:runtime && vite build && node scripts/generate-source-asset-map.mjs dist",
     "build:with-piper": "npm run build:piper-wasm && npm run build",
