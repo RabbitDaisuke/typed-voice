@@ -930,6 +930,7 @@ body.tutorial-window-dragging * { cursor: grabbing !important; }
 .tutorial-footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 24px 22px; border-top: 1px solid #e4ded6; }
 .tutorial-expand-button {
   display: none;
+  position: relative;
   background: #9d4d24;
   border-color: #8d421d;
   color: #fff;
@@ -1004,7 +1005,8 @@ body.tutorial-window-dragging * { cursor: grabbing !important; }
 }
 .tutorial-nav-button { min-width: 112px; }
 .tutorial-next-button { position: relative; min-width: 220px; min-height: 56px; font-size: 1rem; background: #9d4d24; border-color: #8d421d; }
-.tutorial-needs-attention .tutorial-next-button:not(:disabled)::before {
+.tutorial-needs-attention .tutorial-next-button:not(:disabled)::before,
+.tutorial-overlay.tutorial-minimize-attention .tutorial-expand-button:not(:disabled)::before {
   content: "";
   position: absolute;
   left: 50%;
@@ -1018,7 +1020,8 @@ body.tutorial-window-dragging * { cursor: grabbing !important; }
   filter: drop-shadow(0 4px 4px #42180755);
   animation: tutorial-next-arrow-bob 1.15s ease-in-out infinite;
 }
-.tutorial-needs-attention .tutorial-next-button:not(:disabled)::after {
+.tutorial-needs-attention .tutorial-next-button:not(:disabled)::after,
+.tutorial-overlay.tutorial-minimize-attention .tutorial-expand-button:not(:disabled)::after {
   content: "";
   position: absolute;
   left: 50%;
@@ -1063,6 +1066,7 @@ body.tutorial-window-dragging * { cursor: grabbing !important; }
   grid-template-rows: auto;
   border-radius: 18px 18px 0 0;
 }
+.tutorial-overlay.tutorial-live.tutorial-minimized.tutorial-minimize-attention .tutorial-shell { overflow: visible; }
 .tutorial-overlay.tutorial-live.tutorial-minimized .tutorial-header,
 .tutorial-overlay.tutorial-live.tutorial-minimized .tutorial-pages,
 .tutorial-overlay.tutorial-live.tutorial-minimized .tutorial-footer > .tutorial-nav-button,

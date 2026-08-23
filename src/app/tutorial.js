@@ -199,7 +199,6 @@ export class TutorialController {
     this.dragState = null;
     this.windowMinimized = false;
     this.windowMinimizeHintUsed = false;
-    this.windowMinimizeHintVisible = false;
     this.elements = this.#resolveElements();
   }
 
@@ -706,12 +705,11 @@ export class TutorialController {
     if (next && !this.elements.overlay.classList.contains("tutorial-live")) return;
     this.windowMinimized = next;
     this.elements.overlay.classList.toggle("tutorial-minimized", next);
-    if (next && !this.windowMinimizeHintUsed) {
+    const showMinimizeHint = next && !this.windowMinimizeHintUsed;
+    if (showMinimizeHint) {
       this.windowMinimizeHintUsed = true;
-      this.windowMinimizeHintVisible = true;
-    } else {
-      this.windowMinimizeHintVisible = false;
     }
+    this.elements.overlay.classList.toggle("tutorial-minimize-attention", showMinimizeHint);
     this.#applyLiveWindowPosition();
     if (focus) {
       (next ? this.elements.expand : this.elements.minimize).focus({ preventScroll: true });
@@ -1101,7 +1099,7 @@ export class TutorialController {
     this.#cleanupDemo();
     this.elements.overlay.hidden = true;
     this.document.body.classList.remove("tutorial-open", "tutorial-scrollable", "tutorial-window-dragging");
-    this.elements.overlay.classList.remove("tutorial-minimized");
+    this.elements.overlay.classList.remove("tutorial-minimized", "tutorial-minimize-attention");
     this.windowMinimized = false;
     this.elements.dragHandle.classList.remove("is-dragging");
     this.dragState = null;
@@ -1992,7 +1990,7 @@ export class TutorialController {
 
   #refreshTargetArrow() {
     const arrow = this.elements.targetArrow;
-    const target = this.windowMinimizeHintVisible ? this.elements.expand : this.targetArrowTarget;
+    const target = this.targetArrowTarget;
     if (!target || !target.isConnected || this.elements.overlay.hidden) {
       arrow.hidden = true;
       return;
