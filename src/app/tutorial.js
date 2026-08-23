@@ -2037,11 +2037,21 @@ export class TutorialController {
 
   #refreshOffscreenHand(target) {
     const hand = this.offscreenHand;
-    if (!hand || !target || !target.isConnected || this.elements.overlay.hidden) {
+    if (
+      !hand ||
+      !target ||
+      !target.isConnected ||
+      this.elements.overlay.hidden ||
+      !this.elements.overlay.classList.contains("tutorial-live")
+    ) {
       if (hand) hand.hidden = true;
       return;
     }
     const rect = target.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) {
+      hand.hidden = true;
+      return;
+    }
     const viewportWidth = globalThis.innerWidth || this.document.documentElement.clientWidth;
     const viewportHeight = globalThis.innerHeight || this.document.documentElement.clientHeight;
     const overflow = {
