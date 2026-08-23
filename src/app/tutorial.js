@@ -747,6 +747,15 @@ export class TutorialController {
       return;
     }
     if (!this.liveWindowPosition) {
+      const viewportWidth = globalThis.innerWidth || this.document.documentElement.clientWidth;
+      const viewportHeight = globalThis.innerHeight || this.document.documentElement.clientHeight;
+      if (viewportWidth <= 600 && viewportHeight <= 1000 && !this.windowMinimized) {
+        shell.style.left = "auto";
+        shell.style.top = "10px";
+        shell.style.right = "10px";
+        shell.style.bottom = "auto";
+        return;
+      }
       shell.style.removeProperty("left");
       shell.style.removeProperty("top");
       shell.style.removeProperty("right");
