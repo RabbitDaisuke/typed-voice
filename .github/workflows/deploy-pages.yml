@@ -67,35 +67,6 @@ jobs:
       - name: Build production app, Voice PoC, and source cache map
         run: npm run build
 
-      - name: Checkout CDN repository
-        if: github.ref == 'refs/heads/main'
-        uses: actions/checkout@v7
-        with:
-          repository: DaisukeDaisuke/typed-voice-cdn
-          ref: main
-          token: ${{ secrets.TYPED_VOICE_CDN_TOKEN }}
-          path: typed-voice-cdn
-
-      - name: Deploy ONNX Runtime WASM and source asset map to CDN repository main
-        if: github.ref == 'refs/heads/main'
-        run: |
-          rm -f typed-voice-cdn/ort-wasm-simd-threaded.*.wasm
-          rm -f typed-voice-cdn/ort-wasm-simd-threaded.wasm
-          cp dist/ort-wasm-simd-threaded.*.wasm typed-voice-cdn/
-          cp dist/ort-wasm-simd-threaded.wasm typed-voice-cdn/
-          cp dist/source-asset-map.json typed-voice-cdn/
-          git -C typed-voice-cdn config user.name "github-actions[bot]"
-          git -C typed-voice-cdn config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C typed-voice-cdn add -A -- \
-            'ort-wasm-simd-threaded.*.wasm' \
-            ort-wasm-simd-threaded.wasm \
-            source-asset-map.json
-          if git -C typed-voice-cdn diff --cached --quiet; then
-            exit 0
-          fi
-          git -C typed-voice-cdn commit -m "Deploy typed-voice ${GITHUB_SHA}"
-          git -C typed-voice-cdn push origin HEAD:main
-
       - name: Configure Pages
         uses: actions/configure-pages@v6
 
