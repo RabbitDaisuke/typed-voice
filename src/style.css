@@ -730,7 +730,6 @@ body.tutorial-window-dragging * { cursor: grabbing !important; }
   --tutorial-offscreen-hand-y: 0px;
   --tutorial-offscreen-hand-dx: 0px;
   --tutorial-offscreen-hand-dy: 0px;
-  --tutorial-offscreen-hand-rotate: 0deg;
   position: fixed;
   z-index: 9003;
   left: var(--tutorial-offscreen-hand-x);
@@ -782,12 +781,12 @@ body.tutorial-window-dragging * { cursor: grabbing !important; }
   50% { transform: translateY(-15px); }
 }
 @keyframes tutorial-offscreen-hand-move {
-  0% { opacity: 0; transform: translate(0, 0) rotate(var(--tutorial-offscreen-hand-rotate)); }
+  0% { opacity: 0; transform: translate(0, 0); }
   14% { opacity: 1; }
   72% { opacity: 1; }
   100% {
     opacity: 0;
-    transform: translate(var(--tutorial-offscreen-hand-dx), var(--tutorial-offscreen-hand-dy)) rotate(var(--tutorial-offscreen-hand-rotate));
+    transform: translate(var(--tutorial-offscreen-hand-dx), var(--tutorial-offscreen-hand-dy));
   }
 }
 @keyframes tutorial-scroll-thumb {

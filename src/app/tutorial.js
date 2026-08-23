@@ -2074,20 +2074,20 @@ export class TutorialController {
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     const margin = 18;
+    const edgeInset = 72;
     const handWidth = 48;
     const handHeight = 62;
     const positions = {
-      up: [Math.max(margin, Math.min(viewportWidth - handWidth - margin, centerX - handWidth / 2)), margin, 0, -42, 0],
-      down: [Math.max(margin, Math.min(viewportWidth - handWidth - margin, centerX - handWidth / 2)), viewportHeight - handHeight - margin, 0, 42, 180],
-      left: [margin, Math.max(margin, Math.min(viewportHeight - handHeight - margin, centerY - handHeight / 2)), -42, 0, -90],
-      right: [viewportWidth - handWidth - margin, Math.max(margin, Math.min(viewportHeight - handHeight - margin, centerY - handHeight / 2)), 42, 0, 90],
+      up: [Math.max(margin, Math.min(viewportWidth - handWidth - margin, centerX - handWidth / 2)), edgeInset, 0, -42],
+      down: [Math.max(margin, Math.min(viewportWidth - handWidth - margin, centerX - handWidth / 2)), viewportHeight - handHeight - edgeInset, 0, 42],
+      left: [edgeInset, Math.max(margin, Math.min(viewportHeight - handHeight - margin, centerY - handHeight / 2)), -42, 0],
+      right: [viewportWidth - handWidth - edgeInset, Math.max(margin, Math.min(viewportHeight - handHeight - margin, centerY - handHeight / 2)), 42, 0],
     };
-    const [x, y, dx, dy, rotate] = positions[direction];
+    const [x, y, dx, dy] = positions[direction];
     hand.style.setProperty("--tutorial-offscreen-hand-x", `${Math.round(x)}px`);
     hand.style.setProperty("--tutorial-offscreen-hand-y", `${Math.round(y)}px`);
     hand.style.setProperty("--tutorial-offscreen-hand-dx", `${dx}px`);
     hand.style.setProperty("--tutorial-offscreen-hand-dy", `${dy}px`);
-    hand.style.setProperty("--tutorial-offscreen-hand-rotate", `${rotate}deg`);
   }
 
   #resolveElements() {
