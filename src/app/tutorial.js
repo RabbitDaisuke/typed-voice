@@ -197,6 +197,7 @@ export class TutorialController {
     this.deviceLabelPromise = null;
     this.liveWindowPosition = null;
     this.dragState = null;
+    this.windowMinimized = false;
     this.elements = this.#resolveElements();
   }
 
@@ -210,6 +211,8 @@ export class TutorialController {
     this.elements.dragHandle.addEventListener("pointermove", (event) => this.#moveWindowDrag(event));
     this.elements.dragHandle.addEventListener("pointerup", (event) => this.#endWindowDrag(event));
     this.elements.dragHandle.addEventListener("pointercancel", (event) => this.#endWindowDrag(event));
+    this.elements.minimize.addEventListener("click", () => this.#setWindowMinimized(true));
+    this.elements.expand.addEventListener("click", () => this.#setWindowMinimized(false));
     void this.#updateDeviceSynthesisCopy();
     this.elements.back.addEventListener("click", () => void this.previous());
     this.elements.next.addEventListener("click", () => void this.next());
@@ -380,6 +383,7 @@ export class TutorialController {
       this.elements.modelLoadReplayAfterLoad.checked = true;
       this.app?.setReplayAfterVoiceLoad?.(true);
       this.dragState = null;
+      this.#setWindowMinimized(false, { focus: false });
       this.document.body.classList.remove("tutorial-window-dragging");
       this.elements.dragHandle.classList.remove("is-dragging");
       this.#scrollPageToTop();
@@ -494,6 +498,7 @@ export class TutorialController {
     for (const candidate of this.elements.pages) candidate.hidden = candidate !== page;
     const freeInteraction = page.hasAttribute("data-tutorial-live") && page.dataset.tutorialStep !== "tsukuyomichan";
     this.elements.overlay.classList.toggle("tutorial-live", freeInteraction);
+    if (!freeInteraction) this.#setWindowMinimized(false, { focus: false });
     this.elements.overlay.setAttribute("aria-modal", freeInteraction ? "false" : "true");
     this.elements.overlay.dataset.step = page.dataset.tutorialStep;
     this.#applyLiveWindowPosition();
@@ -694,6 +699,18 @@ export class TutorialController {
     event.preventDefault();
   }
 
+  #setWindowMinimized(minimized, { focus = true } = {}) {
+    const next = Boolean(minimized);
+    if (next && !this.elements.overlay.classList.contains("tutorial-live")) return;
+    this.windowMinimized = next;
+    this.elements.overlay.classList.toggle("tutorial-minimized", next);
+    this.#applyLiveWindowPosition();
+    if (focus) {
+      (next ? this.elements.expand : this.elements.minimize).focus({ preventScroll: true });
+    }
+    this.#refreshTargetArrow();
+  }
+
   #moveWindowDrag(event) {
     if (!this.dragState || event.pointerId !== this.dragState.pointerId) return;
     const position = this.#clampLiveWindowPosition(
@@ -750,7 +767,7 @@ export class TutorialController {
   }
 
   #handleViewportResize() {
-    if (this.liveWindowPosition) this.#applyLiveWindowPosition();
+    if (this.liveWindowPosition && !this.windowMinimized) this.#applyLiveWindowPosition();
     this.#refreshTargetArrow();
   }
 
@@ -1076,6 +1093,8 @@ export class TutorialController {
     this.#cleanupDemo();
     this.elements.overlay.hidden = true;
     this.document.body.classList.remove("tutorial-open", "tutorial-scrollable", "tutorial-window-dragging");
+    this.elements.overlay.classList.remove("tutorial-minimized");
+    this.windowMinimized = false;
     this.elements.dragHandle.classList.remove("is-dragging");
     this.dragState = null;
     this.targetArrowTarget = null;
@@ -2006,6 +2025,8 @@ export class TutorialController {
       focusAnchor: byId("tutorial-focus-anchor"),
       shell: overlay.querySelector(".tutorial-shell"),
       headerBrand: overlay.querySelector(".tutorial-header-brand"),
+      minimize: byId("tutorial-minimize"),
+      expand: byId("tutorial-expand"),
       dragHandle: byId("tutorial-drag-handle"),
       pages: [...overlay.querySelectorAll("[data-tutorial-step]")],
       summaryJumpButtons: [...overlay.querySelectorAll("[data-tutorial-jump]")],

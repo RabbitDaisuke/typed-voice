@@ -349,9 +349,12 @@ https://tyc.rei-yumesaki.net
           <span class="tutorial-header-brand">はじめての typed-voice</span>
           <h2 id="tutorial-title">操作チュートリアル</h2>
         </div>
-        <button id="tutorial-drag-handle" class="tutorial-drag-handle" type="button" aria-label="チュートリアルウィンドウを移動" title="ドラッグして移動">
-          <span></span><span></span><span></span>
-        </button>
+        <div class="tutorial-window-actions">
+          <button id="tutorial-minimize" class="tutorial-minimize-button" type="button" aria-label="チュートリアルを最小化" title="最小化">−</button>
+          <button id="tutorial-drag-handle" class="tutorial-drag-handle" type="button" aria-label="チュートリアルウィンドウを移動" title="ドラッグして移動">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
       </header>
 
       <div class="tutorial-pages">
@@ -767,6 +770,7 @@ https://tyc.rei-yumesaki.net
       </div>
 
       <footer class="tutorial-footer">
+        <button id="tutorial-expand" class="quiet-button tutorial-expand-button" type="button">チュートリアルを展開</button>
         <button id="tutorial-back" class="quiet-button tutorial-nav-button" type="button">戻る</button>
         <p id="tutorial-runtime-status" class="tutorial-runtime-status" aria-live="assertive" hidden></p>
         <div class="tutorial-footer-end">
