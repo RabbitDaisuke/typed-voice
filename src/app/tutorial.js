@@ -203,11 +203,7 @@ export class TutorialController {
   }
 
   initialize() {
-    this.offscreenHand = this.elements.scrollHand.cloneNode(true);
-    this.offscreenHand.classList.add("tutorial-offscreen-hand");
-    this.offscreenHand.querySelector("defs")?.remove();
-    this.document.body.append(this.offscreenHand);
-    this.offscreenHand.hidden = true;
+    this.offscreenHand = null;
     this.elements.overlay.addEventListener("pointerdown", () => this.#acknowledgeStep());
     this.elements.overlay.addEventListener("keydown", () => this.#acknowledgeStep());
     this.document.addEventListener("click", (event) => this.#guardTutorialNavigation(event), true);
@@ -1119,7 +1115,8 @@ export class TutorialController {
     this.dragState = null;
     this.targetArrowTarget = null;
     this.elements.targetArrow.hidden = true;
-    if (this.offscreenHand) this.offscreenHand.hidden = true;
+    this.offscreenHand?.remove();
+    this.offscreenHand = null;
     this.#stopSample({ close: true });
     this.elements.composer.focus({ preventScroll: true });
   }
@@ -2036,20 +2033,20 @@ export class TutorialController {
   }
 
   #refreshOffscreenHand(target) {
-    const hand = this.offscreenHand;
     if (
-      !hand ||
       !target ||
       !target.isConnected ||
       this.elements.overlay.hidden ||
       !this.elements.overlay.classList.contains("tutorial-live")
     ) {
-      if (hand) hand.hidden = true;
+      this.offscreenHand?.remove();
+      this.offscreenHand = null;
       return;
     }
     const rect = target.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) {
-      hand.hidden = true;
+      this.offscreenHand?.remove();
+      this.offscreenHand = null;
       return;
     }
     const viewportWidth = globalThis.innerWidth || this.document.documentElement.clientWidth;
@@ -2062,8 +2059,17 @@ export class TutorialController {
     };
     const [direction, distance] = Object.entries(overflow).sort((a, b) => b[1] - a[1])[0];
     if (distance <= 0) {
-      hand.hidden = true;
+      this.offscreenHand?.remove();
+      this.offscreenHand = null;
       return;
+    }
+    let hand = this.offscreenHand;
+    if (!hand) {
+      hand = this.elements.scrollHand.cloneNode(true);
+      hand.classList.add("tutorial-offscreen-hand");
+      hand.querySelector("defs")?.remove();
+      this.document.body.append(hand);
+      this.offscreenHand = hand;
     }
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
@@ -2082,7 +2088,6 @@ export class TutorialController {
     hand.style.setProperty("--tutorial-offscreen-hand-dx", `${dx}px`);
     hand.style.setProperty("--tutorial-offscreen-hand-dy", `${dy}px`);
     hand.style.setProperty("--tutorial-offscreen-hand-rotate", `${rotate}deg`);
-    hand.hidden = false;
   }
 
   #resolveElements() {
