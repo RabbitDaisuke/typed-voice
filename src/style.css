@@ -934,34 +934,6 @@ body.tutorial-window-dragging * { cursor: grabbing !important; }
   border-color: #8d421d;
   color: #fff;
 }
-.tutorial-expand-hint {
-  position: relative;
-  flex: 0 0 46px;
-  width: 46px;
-  height: 22px;
-}
-.tutorial-expand-hint[hidden] { display: none; }
-.tutorial-expand-hint::before {
-  content: "";
-  position: absolute;
-  left: 2px;
-  top: 9px;
-  width: 34px;
-  height: 4px;
-  border-radius: 999px;
-  background: #9d4d24;
-}
-.tutorial-expand-hint::after {
-  content: "";
-  position: absolute;
-  right: 1px;
-  top: 4px;
-  width: 12px;
-  height: 12px;
-  border-top: 4px solid #9d4d24;
-  border-right: 4px solid #9d4d24;
-  transform: rotate(45deg);
-}
 .tutorial-runtime-status { flex: 1; margin: 0; color: #8d301f; font-size: 0.78rem; line-height: 1.4; }
 .tutorial-footer-end { display: flex; align-items: end; justify-content: flex-end; gap: 14px; }
 .tutorial-footer-meta { min-width: 72px; display: grid; justify-items: end; align-content: end; gap: 5px; }

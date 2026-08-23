@@ -199,6 +199,7 @@ export class TutorialController {
     this.dragState = null;
     this.windowMinimized = false;
     this.windowMinimizeHintUsed = false;
+    this.windowMinimizeHintVisible = false;
     this.elements = this.#resolveElements();
   }
 
@@ -707,9 +708,9 @@ export class TutorialController {
     this.elements.overlay.classList.toggle("tutorial-minimized", next);
     if (next && !this.windowMinimizeHintUsed) {
       this.windowMinimizeHintUsed = true;
-      this.elements.expandHint.hidden = false;
+      this.windowMinimizeHintVisible = true;
     } else {
-      this.elements.expandHint.hidden = true;
+      this.windowMinimizeHintVisible = false;
     }
     this.#applyLiveWindowPosition();
     if (focus) {
@@ -1991,7 +1992,7 @@ export class TutorialController {
 
   #refreshTargetArrow() {
     const arrow = this.elements.targetArrow;
-    const target = this.targetArrowTarget;
+    const target = this.windowMinimizeHintVisible ? this.elements.expand : this.targetArrowTarget;
     if (!target || !target.isConnected || this.elements.overlay.hidden) {
       arrow.hidden = true;
       return;
@@ -2034,7 +2035,6 @@ export class TutorialController {
       headerBrand: overlay.querySelector(".tutorial-header-brand"),
       minimize: byId("tutorial-minimize"),
       expand: byId("tutorial-expand"),
-      expandHint: byId("tutorial-expand-hint"),
       dragHandle: byId("tutorial-drag-handle"),
       pages: [...overlay.querySelectorAll("[data-tutorial-step]")],
       summaryJumpButtons: [...overlay.querySelectorAll("[data-tutorial-jump]")],
