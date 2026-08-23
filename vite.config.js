@@ -18,9 +18,6 @@ export default defineConfig({
     },
     hmr: isCodespaces ? false : undefined,
   },
-  optimizeDeps: {
-    exclude: ["onnxruntime-web", "onnxruntime-web/all"],
-  },
   build: {
     target: "es2022",
     manifest: true,

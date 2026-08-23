@@ -46,6 +46,7 @@ function createDb() {
 test("typed-voice所有Cacheだけを判定する", () => {
   assert.equal(isTypedVoiceOwnedCacheName("typed-voice-model-assets-v2"), true);
   assert.equal(isTypedVoiceOwnedCacheName("typed-voice-kanalizer-model-v1"), true);
+  assert.equal(isTypedVoiceOwnedCacheName("typed-voice-onnxruntime-web-1.27.0"), true);
   assert.equal(isTypedVoiceOwnedCacheName("typed-voice-source-2026-08-17-45"), true);
   assert.equal(isTypedVoiceOwnedCacheName("typed-voice-huggingface-resolve-2026-08-17-45"), true);
   assert.equal(isTypedVoiceOwnedCacheName("desmume_webassembly-cache-v1"), false);

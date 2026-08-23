@@ -21,9 +21,6 @@ const buildNumber = /^\d+$/.test(String(process.env.GITHUB_RUN_NUMBER || ""))
   : null;
 
 async function fallbackOriginalFiles(relativePath) {
-  if (/^ort-wasm.*\.(?:mjs|wasm)$/i.test(relativePath)) {
-    return [`node_modules/onnxruntime-web/dist/${relativePath}`];
-  }
   if (["index.html", "worker.html", "pairing.html", "poc.html", "licenses.html"].includes(relativePath)) {
     return [relativePath];
   }
@@ -70,8 +67,7 @@ function classifyAsset(path, sets) {
   if (sets.client.has(path)) return "client";
   if (sets.engine.has(path)
     || /(?:^|\/)(?:engine(?:\.worker|-client)|kanalizer-normalizer)-/i.test(path)
-    || /(?:^|\/)(?:ort-wasm|kanalizer_browser_bg|dictionary-)/i.test(path)
-    || /^ort-wasm.*\.(?:mjs|wasm)$/i.test(path)) return "engine";
+    || /(?:^|\/)(?:kanalizer_browser_bg|dictionary-)/i.test(path)) return "engine";
   return "optional";
 }
 

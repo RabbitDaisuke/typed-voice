@@ -11,6 +11,14 @@ const SOURCE_METADATA_CACHE = "typed-voice-source-metadata-v1";
 const OFFLINE_TUTORIAL_CACHE = "typed-voice-offline-tutorial-v1";
 const PAIRING_ON_DEMAND_CACHE_PREFIX = "typed-voice-pairing-on-demand-";
 const HUGGINGFACE_RESOLVE_CACHE = "typed-voice-huggingface-resolve-v1";
+const ORT_RUNTIME_CACHE = "typed-voice-onnxruntime-web-1.27.0";
+const ORT_DIST_BASE_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.27.0/dist/";
+const ORT_RUNTIME_ASSETS = Object.freeze([
+  Object.freeze({ url: `${ORT_DIST_BASE_URL}ort.min.js`, byteSize: 360434 }),
+  Object.freeze({ url: `${ORT_DIST_BASE_URL}ort-wasm-simd-threaded.jsep.mjs`, byteSize: 46614 }),
+  Object.freeze({ url: `${ORT_DIST_BASE_URL}ort-wasm-simd-threaded.jsep.wasm`, byteSize: 26827543 }),
+]);
+const ORT_RUNTIME_URLS = new Set(ORT_RUNTIME_ASSETS.map((asset) => asset.url));
 const OFFLINE_TUTORIAL_URL = new URL("offline-tutorial-required.html", self.registration.scope).href;
 const SOURCE_ASSET_MAP_URL = new URL("source-asset-map.json", self.registration.scope).href;
 const SOURCE_LATEST_REVIEW_URL = new URL("__typed_voice_source/latest-review.json", self.registration.scope).href;
@@ -95,6 +103,70 @@ async function tracedResponse(request, route, responsePromise, reason = "") {
 
 function isExplicitlyOffline() {
   return self.navigator?.onLine === false;
+}
+
+function sourceGroupsNeedOrtRuntime(groups) {
+  return Array.isArray(groups) && groups.includes("engine");
+}
+
+async function planOrtRuntimeAssets(groups) {
+  if (!sourceGroupsNeedOrtRuntime(groups)) {
+    return { totalBytes: 0, fetchBytes: 0, reusableBytes: 0, assetCount: 0, fetchCount: 0 };
+  }
+  const cache = await caches.open(ORT_RUNTIME_CACHE);
+  let fetchBytes = 0;
+  let reusableBytes = 0;
+  let fetchCount = 0;
+  for (const asset of ORT_RUNTIME_ASSETS) {
+    if (await cache.match(asset.url)) reusableBytes += asset.byteSize;
+    else {
+      fetchBytes += asset.byteSize;
+      fetchCount += 1;
+    }
+  }
+  return {
+    totalBytes: ORT_RUNTIME_ASSETS.reduce((sum, asset) => sum + asset.byteSize, 0),
+    fetchBytes,
+    reusableBytes,
+    assetCount: ORT_RUNTIME_ASSETS.length,
+    fetchCount,
+  };
+}
+
+async function applyOrtRuntimeAssets(groups, { signal = null } = {}) {
+  if (!sourceGroupsNeedOrtRuntime(groups)) return { networkBytes: 0, reusedBytes: 0, fetchedCount: 0 };
+  const cache = await caches.open(ORT_RUNTIME_CACHE);
+  let networkBytes = 0;
+  let reusedBytes = 0;
+  let fetchedCount = 0;
+  for (const asset of ORT_RUNTIME_ASSETS) {
+    if (signal?.aborted) throw signal.reason ?? new DOMException("Source update cancelled", "AbortError");
+    if (await cache.match(asset.url)) {
+      reusedBytes += asset.byteSize;
+      continue;
+    }
+    const response = await fetch(asset.url, { cache: "no-cache", signal });
+    if (!response.ok) throw new Error(`ONNX Runtime Web asset fetch failed: ${response.status} ${asset.url}`);
+    await cache.put(asset.url, response.clone());
+    networkBytes += asset.byteSize;
+    fetchedCount += 1;
+  }
+  return { networkBytes, reusedBytes, fetchedCount };
+}
+
+async function readOrtRuntimeAsset(request) {
+  const cache = await caches.open(ORT_RUNTIME_CACHE);
+  const cached = await cache.match(request.url);
+  if (cached) return cached;
+  if (isExplicitlyOffline()) {
+    return new Response("ONNX Runtime Web asset is unavailable offline", {
+      status: 503,
+      headers: { "content-type": "text/plain; charset=utf-8" },
+    });
+  }
+  const response = await fetch(request);
+  if (response.ok) await cache.put(request.url, response.clone());
+  return response;
 }
 
 /*
@@ -622,6 +694,12 @@ async function planSourceAssets({ groups, knownAcceptedKey = null } = {}) {
       fetchCount += 1;
     }
   }
+  const ortRuntimePlan = await planOrtRuntimeAssets(groups);
+  totalBytes += ortRuntimePlan.totalBytes;
+  fetchBytes += ortRuntimePlan.fetchBytes;
+  reusableBytes += ortRuntimePlan.reusableBytes;
+  assetCount += ortRuntimePlan.assetCount;
+  fetchCount += ortRuntimePlan.fetchCount;
   await saveSourceState(state);
   return {
     generation: candidate.generation,
@@ -679,6 +757,11 @@ async function applySourceAssets({ groups, signal = null, onProgress = () => {} 
     fetchedCount += 1;
     onProgress({ path, loadedBytes: networkBytes, totalBytes: fetchBytes });
   }
+
+  const ortRuntime = await applyOrtRuntimeAssets(groups, { signal });
+  networkBytes += ortRuntime.networkBytes;
+  reusedBytes += ortRuntime.reusedBytes;
+  fetchedCount += ortRuntime.fetchedCount;
 
   if (signal?.aborted) throw signal.reason ?? new DOMException("Source update cancelled", "AbortError");
   state.acceptedGeneration = candidate.generation;
@@ -1030,6 +1113,10 @@ self.addEventListener("fetch", (event) => {
   }
   if (isHuggingFaceResolveUrl(url) && request.cache !== "no-store") {
     event.respondWith(tracedResponse(request, "huggingface-cache", readHuggingFaceResolveAsset(request)));
+    return;
+  }
+  if (ORT_RUNTIME_URLS.has(url.href)) {
+    event.respondWith(tracedResponse(request, "onnxruntime-web-cache", readOrtRuntimeAsset(request)));
     return;
   }
   if (url.origin !== self.location.origin) {

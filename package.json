@@ -10,14 +10,12 @@
     "licenses:kanalizer": "bash scripts/generate-kanalizer-rust-licenses.sh",
     "dev": "npm run prepare:runtime && vite",
     "build": "npm run prepare:runtime && vite build && node scripts/generate-source-asset-map.mjs dist",
-    "build:with-piper": "npm run build:piper-wasm && npm run build",
     "preview": "vite preview",
     "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "@huggingface/tokenizers": "0.1.3",
-    "hash-wasm": "4.12.0",
-    "onnxruntime-web": "1.27.0"
+    "hash-wasm": "4.12.0"
   },
   "devDependencies": {
     "vite": "8.2.1"

@@ -9,10 +9,12 @@ const MODEL_CACHE_NAME = "typed-voice-model-assets-v2";
 const KANALIZER_MODEL_CACHE_NAME = "typed-voice-kanalizer-model-v1";
 const SOURCE_CACHE_PREFIX = "typed-voice-source-";
 const HUGGINGFACE_RESOLVE_CACHE_PREFIX = "typed-voice-huggingface-resolve-";
+const ORT_RUNTIME_CACHE_NAME = "typed-voice-onnxruntime-web-1.27.0";
 
 export function isTypedVoiceOwnedCacheName(name) {
   return name === MODEL_CACHE_NAME
     || name === KANALIZER_MODEL_CACHE_NAME
+    || name === ORT_RUNTIME_CACHE_NAME
     || name.startsWith(SOURCE_CACHE_PREFIX)
     || name.startsWith(HUGGINGFACE_RESOLVE_CACHE_PREFIX);
 }
