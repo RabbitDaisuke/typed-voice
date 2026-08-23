@@ -725,6 +725,23 @@ body.tutorial-window-dragging * { cursor: grabbing !important; }
   transform-origin: 50% 82%;
   animation: tutorial-scroll-finger 1.2s ease-in-out infinite;
 }
+.tutorial-offscreen-hand {
+  --tutorial-offscreen-hand-x: 0px;
+  --tutorial-offscreen-hand-y: 0px;
+  --tutorial-offscreen-hand-dx: 0px;
+  --tutorial-offscreen-hand-dy: 0px;
+  --tutorial-offscreen-hand-rotate: 0deg;
+  position: fixed;
+  z-index: 9003;
+  left: var(--tutorial-offscreen-hand-x);
+  top: var(--tutorial-offscreen-hand-y);
+  width: 48px;
+  height: 62px;
+  pointer-events: none;
+  overflow: visible;
+  animation: tutorial-offscreen-hand-move 1.15s ease-out infinite;
+}
+.tutorial-offscreen-hand[hidden] { display: none; }
 .tutorial-scroll-mouse {
   position: relative;
   width: 98px;
@@ -763,6 +780,15 @@ body.tutorial-window-dragging * { cursor: grabbing !important; }
 @keyframes tutorial-scroll-finger {
   0%, 100% { transform: translateY(9px); }
   50% { transform: translateY(-15px); }
+}
+@keyframes tutorial-offscreen-hand-move {
+  0% { opacity: 0; transform: translate(0, 0) rotate(var(--tutorial-offscreen-hand-rotate)); }
+  14% { opacity: 1; }
+  72% { opacity: 1; }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tutorial-offscreen-hand-dx), var(--tutorial-offscreen-hand-dy)) rotate(var(--tutorial-offscreen-hand-rotate));
+  }
 }
 @keyframes tutorial-scroll-thumb {
   0%, 100% { transform: translateY(0); }

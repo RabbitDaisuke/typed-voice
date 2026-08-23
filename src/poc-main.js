@@ -118,7 +118,7 @@ speakButton.addEventListener("click", async () => {
         utteranceId,
         generation: 1,
         text: synthesisText,
-        options: { language, speed, seed: 2026081601 },
+        options: { language, speed },
       });
       const elapsed = performance.now() - startedAt;
       await playFloat32(audioContext, result.samples, result.sampleRate);

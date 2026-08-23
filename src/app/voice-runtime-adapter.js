@@ -6,9 +6,6 @@ const REMOTE_MANIFEST_URLS = Object.freeze({
   fp16: "https://huggingface.co/RabbitDaisuke/tsukuyomichan-omnivoice-full-finetune-onnx/resolve/fp16/typed-voice-manifest.json",
 });
 
-const OMNIVOICE_REFERENCE_SEED = 2026081601;
-
-
 export class VoiceRuntimeAdapter {
   constructor({ manifestUrl, appBaseUrl = null, onStatus = () => {} }) {
     this.manifestUrl = manifestUrl;
@@ -224,10 +221,6 @@ export class VoiceRuntimeAdapter {
         options: {
           language,
           speed: this.speed,
-          
-          // 検証済みPoCと同じCPython random.Random互換seedを本番でも使う。
-          seed: OMNIVOICE_REFERENCE_SEED,
-          
         },
       });
       this.#emitProgress({ stage: "synthesis-complete", utteranceId, generation });

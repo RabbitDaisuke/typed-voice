@@ -203,6 +203,11 @@ export class TutorialController {
   }
 
   initialize() {
+    this.offscreenHand = this.elements.scrollHand.cloneNode(true);
+    this.offscreenHand.classList.add("tutorial-offscreen-hand");
+    this.offscreenHand.querySelector("defs")?.remove();
+    this.document.body.append(this.offscreenHand);
+    this.offscreenHand.hidden = true;
     this.elements.overlay.addEventListener("pointerdown", () => this.#acknowledgeStep());
     this.elements.overlay.addEventListener("keydown", () => this.#acknowledgeStep());
     this.document.addEventListener("click", (event) => this.#guardTutorialNavigation(event), true);
@@ -1114,6 +1119,7 @@ export class TutorialController {
     this.dragState = null;
     this.targetArrowTarget = null;
     this.elements.targetArrow.hidden = true;
+    if (this.offscreenHand) this.offscreenHand.hidden = true;
     this.#stopSample({ close: true });
     this.elements.composer.focus({ preventScroll: true });
   }
@@ -2000,6 +2006,7 @@ export class TutorialController {
   #refreshTargetArrow() {
     const arrow = this.elements.targetArrow;
     const target = this.targetArrowTarget;
+    this.#refreshOffscreenHand(target ?? this.document.querySelector(".tutorial-target"));
     if (!target || !target.isConnected || this.elements.overlay.hidden) {
       arrow.hidden = true;
       return;
@@ -2028,6 +2035,46 @@ export class TutorialController {
     arrow.hidden = false;
   }
 
+  #refreshOffscreenHand(target) {
+    const hand = this.offscreenHand;
+    if (!hand || !target || !target.isConnected || this.elements.overlay.hidden) {
+      if (hand) hand.hidden = true;
+      return;
+    }
+    const rect = target.getBoundingClientRect();
+    const viewportWidth = globalThis.innerWidth || this.document.documentElement.clientWidth;
+    const viewportHeight = globalThis.innerHeight || this.document.documentElement.clientHeight;
+    const overflow = {
+      up: Math.max(0, -rect.bottom),
+      down: Math.max(0, rect.top - viewportHeight),
+      left: Math.max(0, -rect.right),
+      right: Math.max(0, rect.left - viewportWidth),
+    };
+    const [direction, distance] = Object.entries(overflow).sort((a, b) => b[1] - a[1])[0];
+    if (distance <= 0) {
+      hand.hidden = true;
+      return;
+    }
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const margin = 18;
+    const handWidth = 48;
+    const handHeight = 62;
+    const positions = {
+      up: [Math.max(margin, Math.min(viewportWidth - handWidth - margin, centerX - handWidth / 2)), margin, 0, -42, 0],
+      down: [Math.max(margin, Math.min(viewportWidth - handWidth - margin, centerX - handWidth / 2)), viewportHeight - handHeight - margin, 0, 42, 180],
+      left: [margin, Math.max(margin, Math.min(viewportHeight - handHeight - margin, centerY - handHeight / 2)), -42, 0, -90],
+      right: [viewportWidth - handWidth - margin, Math.max(margin, Math.min(viewportHeight - handHeight - margin, centerY - handHeight / 2)), 42, 0, 90],
+    };
+    const [x, y, dx, dy, rotate] = positions[direction];
+    hand.style.setProperty("--tutorial-offscreen-hand-x", `${Math.round(x)}px`);
+    hand.style.setProperty("--tutorial-offscreen-hand-y", `${Math.round(y)}px`);
+    hand.style.setProperty("--tutorial-offscreen-hand-dx", `${dx}px`);
+    hand.style.setProperty("--tutorial-offscreen-hand-dy", `${dy}px`);
+    hand.style.setProperty("--tutorial-offscreen-hand-rotate", `${rotate}deg`);
+    hand.hidden = false;
+  }
+
   #resolveElements() {
     const byId = (id) => {
       const element = this.document.getElementById(id);
@@ -2043,6 +2090,7 @@ export class TutorialController {
       minimize: byId("tutorial-minimize"),
       expand: byId("tutorial-expand"),
       dragHandle: byId("tutorial-drag-handle"),
+      scrollHand: overlay.querySelector(".tutorial-scroll-hand"),
       pages: [...overlay.querySelectorAll("[data-tutorial-step]")],
       summaryJumpButtons: [...overlay.querySelectorAll("[data-tutorial-jump]")],
       pagesContainer: overlay.querySelector(".tutorial-pages"),
