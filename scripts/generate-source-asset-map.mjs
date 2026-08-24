@@ -63,7 +63,7 @@ function findManifestKey(viteManifest, suffix) {
 }
 
 function classifyAsset(path, sets) {
-  if (sets.core.has(path) || path === "index.html" || path === "worker.html" || path === "voice-manifest.json") return "core";
+  if (sets.core.has(path) || path === "index.html" || path === "worker.html" || path === "voice-manifest.json" || path === "assets/326586.png") return "core";
   if (sets.client.has(path)) return "client";
   if (sets.engine.has(path)
     || /(?:^|\/)(?:engine(?:\.worker|-client)|kanalizer-normalizer)-/i.test(path)
