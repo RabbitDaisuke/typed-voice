@@ -64,6 +64,8 @@ test("初回チュートリアル中のソース更新はチュートリアル�
   assert.equal(resolveStartupTutorialProfile({ tutorialComplete: true, selectedModelCached: true, sourceUpdateAvailable: true }), "source-update");
   assert.equal(resolveStartupTutorialProfile({ tutorialComplete: true, selectedModelCached: false, sourceFetchBytes: 1 }), "source-update");
   assert.equal(resolveStartupTutorialProfile({ tutorialComplete: true, selectedModelCached: true, sourceFetchBytes: 1 }), "source-update");
+  assert.equal(resolveStartupTutorialProfile({ tutorialComplete: true, selectedModelCached: true, offlineRuntimePending: true }), "runtime-required");
+  assert.equal(resolveStartupTutorialProfile({ tutorialComplete: true, selectedModelCached: false, offlineRuntimePending: true }), "model-picker-required");
   assert.equal(resolveStartupTutorialProfile({ tutorialComplete: true, selectedModelCached: false }), "model-picker-required");
   assert.equal(resolveStartupTutorialProfile({ tutorialComplete: true, selectedModelCached: true }), "end");
 });

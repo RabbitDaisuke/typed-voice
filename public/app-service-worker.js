@@ -212,6 +212,9 @@ self.addEventListener("install", (event) => {
       importScripts(QUICK_FIX_URL);
       if (Array.isArray(self.__typedVoiceQuickFixVersions)) {
         if (!self.registration.active) {
+          if (typeof self.__typedVoiceQuickFixInstall === "function") {
+            await self.__typedVoiceQuickFixInstall();
+          }
           await writeAppliedQuickFixVersions(self.__typedVoiceQuickFixVersions);
         }
       }
@@ -694,12 +697,6 @@ async function planSourceAssets({ groups, knownAcceptedKey = null } = {}) {
       fetchCount += 1;
     }
   }
-  const ortRuntimePlan = await planOrtRuntimeAssets(groups);
-  totalBytes += ortRuntimePlan.totalBytes;
-  fetchBytes += ortRuntimePlan.fetchBytes;
-  reusableBytes += ortRuntimePlan.reusableBytes;
-  assetCount += ortRuntimePlan.assetCount;
-  fetchCount += ortRuntimePlan.fetchCount;
   await saveSourceState(state);
   return {
     generation: candidate.generation,
@@ -757,11 +754,6 @@ async function applySourceAssets({ groups, signal = null, onProgress = () => {} 
     fetchedCount += 1;
     onProgress({ path, loadedBytes: networkBytes, totalBytes: fetchBytes });
   }
-
-  const ortRuntime = await applyOrtRuntimeAssets(groups, { signal });
-  networkBytes += ortRuntime.networkBytes;
-  reusedBytes += ortRuntime.reusedBytes;
-  fetchedCount += ortRuntime.fetchedCount;
 
   if (signal?.aborted) throw signal.reason ?? new DOMException("Source update cancelled", "AbortError");
   state.acceptedGeneration = candidate.generation;
@@ -996,6 +988,50 @@ self.addEventListener("message", (event) => {
     const clientId = event.source?.id;
     if (!requestId || !clientId) return;
     sourceApplyControllers.get(`${clientId}:${requestId}`)?.abort(new DOMException("Source update cancelled", "AbortError"));
+    return;
+  }
+  if (message?.type === "typed-voice:plan-ort-runtime-assets") {
+    const port = event.ports?.[0];
+    if (!port) return;
+    event.waitUntil((async () => {
+      try {
+        const plan = await planOrtRuntimeAssets(["engine"]);
+        port.postMessage({ ok: true, plan });
+      } catch (error) {
+        port.postMessage({ ok: false, message: error instanceof Error ? error.message : String(error) });
+      }
+    })());
+    return;
+  }
+  if (message?.type === "typed-voice:prepare-ort-runtime-assets") {
+    const port = event.ports?.[0];
+    if (!port) return;
+    const requestId = String(message.requestId || "");
+    const clientId = event.source?.id;
+    if (!requestId || !clientId) {
+      port.postMessage({ ok: false, message: "invalid ONNX Runtime preparation request" });
+      return;
+    }
+    const key = `ort:${clientId}:${requestId}`;
+    const controller = new AbortController();
+    sourceApplyControllers.set(key, controller);
+    event.waitUntil((async () => {
+      try {
+        const result = await applyOrtRuntimeAssets(["engine"], { signal: controller.signal });
+        port.postMessage({ ok: true, result });
+      } catch (error) {
+        port.postMessage({ ok: false, message: error instanceof Error ? error.message : String(error) });
+      } finally {
+        sourceApplyControllers.delete(key);
+      }
+    })());
+    return;
+  }
+  if (message?.type === "typed-voice:cancel-ort-runtime-assets") {
+    const requestId = String(message.requestId || "");
+    const clientId = event.source?.id;
+    if (!requestId || !clientId) return;
+    sourceApplyControllers.get(`ort:${clientId}:${requestId}`)?.abort(new DOMException("ONNX Runtime preparation cancelled", "AbortError"));
     return;
   }
   if (message?.type === "typed-voice:check-model-cache") {

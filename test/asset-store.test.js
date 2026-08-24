@@ -233,6 +233,85 @@ test("再ロード時の初期化はCache本体をXXH3-128再検証し破損資�
   assert.equal(progress.some((value) => value.phase === "verifying-cache"), true);
 });
 
+test("Cache読取の一時エラーだけでは準備済みモデルを削除しない", async () => {
+  const baseUrl = "https://example.test/typed-voice/";
+  const entries = new Map();
+  const records = new Map();
+  for (const currentAsset of manifest.assets) {
+    const virtualUrl = buildVirtualAssetUrl(manifest.id, currentAsset.localPath, baseUrl);
+    entries.set(virtualUrl, new Response(new TextEncoder().encode("abc")));
+    records.set(`${manifest.id}:${currentAsset.id}`, {
+      key: `${manifest.id}:${currentAsset.id}`,
+      manifestId: manifest.id,
+      assetId: currentAsset.id,
+      virtualUrl,
+      sha256: currentAsset.sha256,
+      xxh3_128: currentAsset.xxh3_128,
+      byteSize: currentAsset.byteSize,
+    });
+  }
+
+  const transientAsset = manifest.assets[0];
+  const transientUrl = buildVirtualAssetUrl(manifest.id, transientAsset.localPath, baseUrl);
+  entries.set(transientUrl, new Response(new ReadableStream({
+    start(controller) {
+      controller.error(new Error("temporary cache read failure"));
+    },
+  })));
+
+  await assert.rejects(
+    () => assertPreparedVoiceAssets(manifest, {
+      baseUrl,
+      cachesImpl: { open: async () => createFakeCache(entries) },
+      db: createFakeDb(records),
+    }),
+    /temporary cache read failure/
+  );
+  assert.equal(entries.has(transientUrl), true);
+  assert.equal(records.has(`${manifest.id}:${transientAsset.id}`), true);
+});
+
+test("準備済みモデルのチャンク欠損だけではキャッシュを削除しない", async () => {
+  const baseUrl = "https://example.test/typed-voice/";
+  const entries = new Map();
+  const records = new Map();
+  const missingAsset = manifest.assets[0];
+  const virtualUrl = buildVirtualAssetUrl(manifest.id, missingAsset.localPath, baseUrl);
+  const chunk0Url = new URL(virtualUrl);
+  chunk0Url.searchParams.set("__typed_voice_part", "0");
+  entries.set(virtualUrl, new Response(null, {
+    status: 200,
+    headers: {
+      "x-typed-voice-chunk-count": "2",
+      "x-typed-voice-byte-size": String(missingAsset.byteSize),
+      "x-typed-voice-content-type": "application/octet-stream",
+      "x-typed-voice-xxh3-128": missingAsset.xxh3_128,
+    },
+  }));
+  entries.set(chunk0Url.href, new Response(new Uint8Array([97])));
+  records.set(`${manifest.id}:${missingAsset.id}`, {
+    key: `${manifest.id}:${missingAsset.id}`,
+    manifestId: manifest.id,
+    assetId: missingAsset.id,
+    virtualUrl,
+    sha256: missingAsset.sha256,
+    xxh3_128: missingAsset.xxh3_128,
+    byteSize: missingAsset.byteSize,
+  });
+
+  await assert.rejects(
+    () => assertPreparedVoiceAssets(manifest, {
+      baseUrl,
+      cachesImpl: { open: async () => createFakeCache(entries) },
+      db: createFakeDb(records),
+    }),
+    /missing or corrupt/
+  );
+  assert.equal(entries.has(virtualUrl), true);
+  assert.equal(entries.has(chunk0Url.href), true);
+  assert.equal(records.has(`${manifest.id}:${missingAsset.id}`), true);
+});
+
 test("旧SHA metadataだけのCacheも再downloadせずXXH3-128へ昇格する", async () => {
   const baseUrl = "https://example.test/typed-voice/";
   const entries = new Map();

@@ -234,7 +234,9 @@ async function verifyCachedAsset({ cache, db, manifest, asset, virtualUrl, onPro
       onProgress?.({ assetId: asset.id, loaded, total: asset.byteSize });
     });
   } catch (error) {
-    await Promise.all([deleteCachedAsset(cache, virtualUrl), deleteMetadata(db, keyFor(manifest.id, asset.id))]);
+    if (error instanceof Error && error.message.startsWith("Cached model chunk is missing:")) {
+      return false;
+    }
     throw error;
   }
 

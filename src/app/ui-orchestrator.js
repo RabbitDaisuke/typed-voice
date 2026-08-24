@@ -19,6 +19,7 @@ import {
   restoreApplicationBackup,
 } from "./application-backup.js";
 import { markTutorialComplete } from "./tutorial-persistence.js";
+import { planOrtRuntimeAssets, prepareOrtRuntimeAssets } from "./service-worker-required.js";
 
 const DEFAULT_REASONING_SECONDS = 2;
 const CONVERSATION_PARAM = "conversation";
@@ -278,6 +279,14 @@ export class UiOrchestrator {
 
   async isVoiceProfileCached(profile = this.getModelProfile()) {
     return Boolean(await this.voiceRuntime?.isProfilePrepared?.(profile));
+  }
+
+  async getOfflineRuntimePlan() {
+    return planOrtRuntimeAssets();
+  }
+
+  async prepareOfflineRuntime({ signal = null } = {}) {
+    return prepareOrtRuntimeAssets({ signal });
   }
 
   async prepareOfflineVoice(profile = this.getModelProfile(), { onKanalizerStatus = () => {}, signal = null } = {}) {

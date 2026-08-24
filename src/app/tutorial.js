@@ -128,9 +128,11 @@ export function resolveStartupTutorialProfile({
   selectedModelCached,
   sourceUpdateAvailable = false,
   sourceFetchBytes = 0,
+  offlineRuntimePending = false,
 }) {
   if (!tutorialComplete) return "full";
   if (sourceUpdateAvailable || Number(sourceFetchBytes || 0) > 0) return "source-update";
+  if (selectedModelCached && offlineRuntimePending) return "runtime-required";
   return selectedModelCached ? "end" : "model-picker-required";
 }
 
@@ -1350,10 +1352,13 @@ export class TutorialController {
       const profile = this.modelProfileUi?.profile ?? "fp16";
       const modelCached = Boolean(await this.app?.isVoiceProfileCached?.(profile));
       this.downloadModelCached = modelCached;
+      const runtimePlan = await this.app?.getOfflineRuntimePlan?.();
+      const runtimeBytes = Math.max(0, Number(runtimePlan?.fetchBytes || 0));
+      this.downloadRuntimeCached = runtimeBytes === 0;
       const sourcePlan = this.sourceUpdate?.plan ?? null;
       const sourcePending = !this.sourceUpdateCompleted
         && (Boolean(sourcePlan?.updateAvailable) || Number(sourcePlan?.fetchBytes || 0) > 0);
-      if (modelCached && !sourcePending) {
+      if (modelCached && !sourcePending && runtimeBytes === 0) {
         this.downloadCompleted = true;
         this.downloadAcknowledged = true;
         this.#renderDownloadDisclosure();
@@ -1365,7 +1370,7 @@ export class TutorialController {
       const modelPlan = modelCached ? null : await this.app.getVoiceProfilePlan(profile);
       const modelBytes = modelCached ? 0 : Number(modelPlan?.totalBytes || 0);
       const sourceBytes = sourcePending ? Number(sourcePlan?.fetchBytes || 0) : 0;
-      const totalBytes = modelBytes + sourceBytes;
+      const totalBytes = modelBytes + sourceBytes + runtimeBytes;
       if ((totalBytes > 0 || sourcePending) && !this.downloadRunning && !this.downloadCompleted) {
         const formatted = this.#formatBytes(totalBytes);
         const device = await this.#getDeviceLabel();
@@ -1420,6 +1425,10 @@ export class TutorialController {
         if (!this.sourceUpdateCompleted && this.sourceUpdate?.prepare) {
           await this.sourceUpdate.prepare({ signal: this.downloadAbortController.signal });
           this.sourceUpdateCompleted = true;
+        }
+        if (!this.downloadRuntimeCached) {
+          await this.app.prepareOfflineRuntime({ signal: this.downloadAbortController.signal });
+          this.downloadRuntimeCached = true;
         }
         if (!this.downloadModelCached) {
           await this.app.prepareOfflineVoice(profile, {

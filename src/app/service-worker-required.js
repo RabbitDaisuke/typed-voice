@@ -4,6 +4,7 @@ export const SOURCE_UPDATE_STORAGE_KEY = "typed-voice-source-cache-key-v2";
 const PREVIOUS_SOURCE_UPDATE_STORAGE_KEY = "typed-voice-source-cache-key-v1";
 const SOURCE_PROTOCOL_VERSION = 2;
 const SERVICE_WORKER_REVIEW_TIMEOUT_MS = 750;
+const MODEL_CACHE_READ_RELOAD_KEY = "typed-voice-model-cache-read-reloads";
 
 function readStorageValue(key, storage = globalThis.localStorage) {
   try {
@@ -143,6 +144,31 @@ export async function applySourceAssets(groups, {
     throw new Error("更新済みソースの世代を保存できませんでした。");
   }
   return result;
+}
+
+export async function planOrtRuntimeAssets() {
+  if (!await supportsSourceProtocol(navigator.serviceWorker?.controller)) {
+    throw new Error("Service WorkerのONNX Runtime確認機能がまだ有効になっていません。再読み込みしてください。");
+  }
+  return requestServiceWorker("typed-voice:plan-ort-runtime-assets", {}, "plan");
+}
+
+export async function prepareOrtRuntimeAssets({ signal = null } = {}) {
+  if (!await supportsSourceProtocol(navigator.serviceWorker?.controller)) {
+    throw new Error("Service WorkerのONNX Runtime保存機能がまだ有効になっていません。再読み込みしてください。");
+  }
+  const requestId = crypto.randomUUID();
+  return requestServiceWorker(
+    "typed-voice:prepare-ort-runtime-assets",
+    { requestId },
+    "result",
+    120_000,
+    {
+      signal,
+      cancelType: "typed-voice:cancel-ort-runtime-assets",
+      requestId,
+    },
+  );
 }
 
 export async function verifyStoredSourceAssets(groups, { onProgress = () => {} } = {}) {
@@ -369,27 +395,76 @@ export async function unregisterTypedVoiceServiceWorker() {
   return true;
 }
 
+async function waitForController(timeoutMs = 5000) {
+  if (navigator.serviceWorker.controller) return navigator.serviceWorker.controller;
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      globalThis.clearTimeout(timeout);
+      navigator.serviceWorker.removeEventListener("controllerchange", finish);
+      resolve(navigator.serviceWorker.controller ?? null);
+    };
+    const timeout = globalThis.setTimeout(finish, timeoutMs);
+    navigator.serviceWorker.addEventListener("controllerchange", finish);
+  });
+}
+
+async function reloadAfterModelCacheReadFailure() {
+  const reloadCount = Number(sessionStorage.getItem(MODEL_CACHE_READ_RELOAD_KEY) || 0);
+  if (reloadCount >= 2) {
+    throw new Error("Service Workerからモデルキャッシュを確認できませんでした。自動再読み込みは2回で停止しました。");
+  }
+
+  const registration = await navigator.serviceWorker.ready;
+  if (!navigator.serviceWorker.controller) {
+    registration.active?.postMessage({ type: "typed-voice:claim-clients" });
+    await waitForController();
+  }
+  if (!navigator.serviceWorker.controller) {
+    throw new Error("Service Workerがこのページを制御していないため、モデルキャッシュを確認できませんでした。");
+  }
+
+  sessionStorage.setItem(MODEL_CACHE_READ_RELOAD_KEY, String(reloadCount + 1));
+  location.reload();
+  return new Promise(() => {});
+}
+
 export async function queryPreparedModelCache(manifestUrl, { appBaseUrl = null } = {}) {
   const controller = navigator.serviceWorker?.controller;
-  if (!controller) return false;
-  return new Promise((resolve) => {
+  if (!controller) return reloadAfterModelCacheReadFailure();
+  try {
+    const prepared = await new Promise((resolve, reject) => {
     const channel = new MessageChannel();
     let settled = false;
-    const finish = (prepared) => {
+    const finish = (callback, value) => {
       if (settled) return;
       settled = true;
       globalThis.clearTimeout(timeout);
       channel.port1.close();
-      resolve(Boolean(prepared));
+      callback(value);
     };
-    const timeout = globalThis.setTimeout(() => finish(false), 5000);
-    channel.port1.onmessage = (event) => finish(event.data?.ok && event.data?.prepared);
-    controller.postMessage({
-      type: "typed-voice:check-model-cache",
-      manifestUrl,
-      appBaseUrl,
-    }, [channel.port2]);
-  });
+    const timeout = globalThis.setTimeout(() => finish(reject, new Error("Service Worker model cache query timed out.")), 5000);
+    channel.port1.onmessage = (event) => {
+      if (event.data?.ok) finish(resolve, Boolean(event.data?.prepared));
+      else finish(reject, new Error(event.data?.message || "Service Worker model cache query failed."));
+    };
+    try {
+      controller.postMessage({
+        type: "typed-voice:check-model-cache",
+        manifestUrl,
+        appBaseUrl,
+      }, [channel.port2]);
+    } catch (error) {
+      finish(reject, error);
+    }
+    });
+    sessionStorage.removeItem(MODEL_CACHE_READ_RELOAD_KEY);
+    return prepared;
+  } catch {
+    return reloadAfterModelCacheReadFailure();
+  }
 }
 
 export function showServiceWorkerRequired() {

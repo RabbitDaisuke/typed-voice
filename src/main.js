@@ -333,6 +333,13 @@ const selectedModelCached = remoteModeUi.isServerMode
       report({ detail: "選択中の音声モデルがこの端末に保存済みかService Workerへ確認しています。" });
       return app.isVoiceProfileCached(modelProfileUi.profile);
     });
+const offlineRuntimePlan = remoteModeUi.isServerMode || serviceWorkerState?.repairRequired
+  ? { fetchBytes: 0 }
+  : await blocking.registerBlockingAsync("音声ランタイム", async ({ report }) => {
+      report({ detail: "オフライン用ONNX Runtimeの保存状態を確認しています。" });
+      return app.getOfflineRuntimePlan();
+    });
+const offlineRuntimePending = Number(offlineRuntimePlan?.fetchBytes || 0) > 0;
 let tutorial = null;
 await blocking.registerBlockingAsync("操作画面", async ({ report }) => {
   report({ detail: "バックアップとチュートリアルを準備しています。" });
@@ -440,6 +447,19 @@ await blocking.registerBlockingAsync("操作画面", async ({ report }) => {
     onComplete: modelPickerComplete,
   });
 
+  const runtimeRequiredProfile = Object.freeze({
+    route: Object.freeze([
+      Object.freeze({ step: "download", id: "download-runtime", nextLabel: "ダウンロード完了" }),
+      Object.freeze({ step: "download-ready", id: "runtime-download-ready", nextLabel: "モデルを読み込む", backLabel: "ダウンロードへ戻る" }),
+      Object.freeze({ step: "model-load", id: "runtime-load-model", nextLabel: "使い始める", backLabel: "戻る" }),
+    ]),
+    headerBrand: "オフライン音声を準備",
+    completionLabel: "使い始める",
+    completeTo: "end",
+    closeOnBackAtStart: false,
+    lockBackDuringModelLoad: true,
+  });
+
   const memoryShortageProfile = Object.freeze({
     route: Object.freeze([
       Object.freeze({ step: "memory-shortage", id: "memory-shortage", nextLabel: "次へ" }),
@@ -509,6 +529,7 @@ await blocking.registerBlockingAsync("操作画面", async ({ report }) => {
     .registerProfile("full", fullTutorialProfile)
     .registerProfile("model-picker", modelPickerProfile)
     .registerProfile("model-picker-required", requiredModelPickerProfile)
+    .registerProfile("runtime-required", runtimeRequiredProfile)
     .registerProfile("memory-shortage", memoryShortageProfile)
     .registerProfile("server-offline", serverOfflineProfile)
     .registerProfile("server-mode", serverModeProfile)
@@ -544,6 +565,7 @@ await blocking.registerBlockingAsync("操作画面", async ({ report }) => {
       selectedModelCached,
       sourceUpdateAvailable: sourceUpdateState.updateAvailable,
       sourceFetchBytes: sourceUpdateState.fetchBytes,
+      offlineRuntimePending,
     }));
   }
 
@@ -586,6 +608,7 @@ blocking.finish();
 if (!remoteModeUi.isServerMode
   && tutorialState.complete
   && selectedModelCached
+  && !offlineRuntimePending
   && !sourceAssetsPending) {
   debug("model-load-delay", "pass");
   globalThis.setTimeout(async () => {
