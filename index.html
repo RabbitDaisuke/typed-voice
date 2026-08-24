@@ -6,16 +6,14 @@
   <meta name="theme-color" content="#f3f1ed">
   <title>typed-voice</title>
   <style>
-    .noscript-required{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;text-align:center;background:#f3f1ed;color:#26231f}.noscript-reload{color:#fff;background:#33302c;padding:8px 13px;border-radius:12px;text-decoration:none}
+    .noscript-required{position:fixed;z-index:10000;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,calc(100vw - 36px));padding:24px;border:1px solid #d7d0c7;border-radius:24px;background:#fffdfa;color:#26231f;box-shadow:0 28px 100px #16120d66;text-align:center}.noscript-required h1{margin:0 0 18px;font-size:1.22rem}.noscript-reload{display:inline-block;color:#fff;background:#33302c;padding:8px 13px;border-radius:12px;text-decoration:none}
   </style>
 </head>
 <body>
   <noscript>
     <div class="noscript-required" role="alert">
-      <div class="noscript-required-card">
-        <h1>JavaScriptを有効にしてください</h1>
-        <a class="noscript-reload" href="">再読み込み</a>
-      </div>
+      <h1>JavaScriptを有効にしてください</h1>
+      <a class="noscript-reload" href="">再読み込み</a>
     </div>
   </noscript>
   <section id="blocking-loader" role="status" aria-live="polite" aria-label="typed-voiceを読み込んでいます">
