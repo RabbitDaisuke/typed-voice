@@ -6,10 +6,18 @@
   <meta name="theme-color" content="#f3f1ed">
   <title>typed-voice</title>
   <style>
-    #blocking-loader{position:fixed;z-index:2000;left:50%;top:max(14px,env(safe-area-inset-top));width:min(620px,calc(100vw - 28px));transform:translateX(-50%);border:1px solid #d7d0c7;border-radius:24px;background:#fffdfa;color:#2f2b27;box-shadow:0 28px 100px #16120d66;overflow:hidden;opacity:1;transition:opacity 1s ease}#blocking-loader[hidden]{display:none}#blocking-loader.is-fading{opacity:0;pointer-events:none}.blocking-loader-card{width:100%;display:grid;gap:14px;padding:18px 24px 22px}.blocking-loader-header{display:flex;align-items:center;gap:16px;padding:16px 18px 12px 24px;border-bottom:1px solid #e4ded6}.blocking-loader-header-copy{display:grid;gap:5px}.blocking-loader-brand{color:#8b6a55;font-size:.74rem;font-weight:800}.blocking-loader-title{margin:0;font-size:1.22rem}.blocking-loader-drag-handle{margin-left:auto;width:78px;height:58px;padding:10px 14px;border:1px solid #d7c5b6;border-radius:15px;background:#f8eee5;cursor:grab;touch-action:none}.blocking-loader-drag-handle:active,.blocking-loader-drag-handle.is-dragging{cursor:grabbing;background:#ead9cb;border-color:#b98b6b}.blocking-loader-drag-handle span{display:block;width:42px;height:4px;margin:4px auto;border-radius:999px;background:#76513a}.blocking-loader-cells{display:grid;grid-template-columns:repeat(auto-fit,minmax(24px,1fr));gap:8px}.blocking-loader-cell{height:20px;border:1px solid #c5b8ab;border-radius:6px;background:#f2ebe4}.blocking-loader-cell.is-running{border-color:#b85f28;background:#f0b17d}.blocking-loader-cell.is-done{border-color:#a85a2d;background:#c96d34}.blocking-loader-cell.is-skipped{border-color:#b9b1a8;background:#d8d3cd}.blocking-loader-cell.is-error{border-color:#b94b42;background:#f0b7b2}.blocking-loader-summary{display:flex;align-items:baseline;justify-content:space-between;gap:16px}.blocking-loader-count{font-size:1.05rem;font-variant-numeric:tabular-nums}.blocking-loader-detail{margin:0;color:#746c62;line-height:1.5}.blocking-detail-progress{display:grid;gap:7px}.blocking-detail-progress[hidden]{display:none}.blocking-detail-progress-head{display:flex;justify-content:space-between;gap:12px;color:#66594f;font-size:.82rem}.blocking-detail-track{height:10px;overflow:hidden;border:1px solid #d1bca9;border-radius:999px;background:#f2ebe4}.blocking-detail-fill{block-size:100%;inline-size:0;background:#c86628;transition:inline-size 120ms linear}
+    .noscript-required{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;text-align:center;background:#f3f1ed;color:#26231f}.noscript-reload{color:#fff;background:#33302c;padding:8px 13px;border-radius:12px;text-decoration:none}
   </style>
 </head>
 <body>
+  <noscript>
+    <div class="noscript-required" role="alert">
+      <div class="noscript-required-card">
+        <h1>JavaScriptを有効にしてください</h1>
+        <a class="noscript-reload" href="">再読み込み</a>
+      </div>
+    </div>
+  </noscript>
   <section id="blocking-loader" role="status" aria-live="polite" aria-label="typed-voiceを読み込んでいます">
     <header class="blocking-loader-header">
       <div class="blocking-loader-header-copy">
