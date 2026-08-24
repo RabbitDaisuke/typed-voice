@@ -179,7 +179,7 @@ const manifest = {
 
 await writeFile(
   join(outputDirectory, outputFileName),
-  `${JSON.stringify(manifest, null, 2)}\n`,
+  `${JSON.stringify(manifest)}\n`,
   "utf8",
 );
 
