@@ -924,6 +924,8 @@ export class TutorialController {
         showPanel: false,
         onBlockingProgress: (update) => this.#renderModelLoadProgress(update),
       });
+      if (!this.tutorialComplete) await this.app?.markTutorialComplete?.();
+      this.tutorialComplete = true;
       visitState.modelLoadComplete = true;
       this.#completeModelLoadCells(this.elements.modelLoadPrimaryCells);
       this.#completeModelLoadCells(this.elements.modelLoadSecondaryCells);
