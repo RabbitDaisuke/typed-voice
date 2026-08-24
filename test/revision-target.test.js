@@ -48,3 +48,21 @@ test("2行とも変更されていれば2件とも訂正する", () => {
   const revisions = planComposerRevisions("一件目修正\n二件目修正", pending);
   assert.deepEqual(revisions.map((item) => item.pending.id), ["first", "second"]);
 });
+
+test("pendingが1件の2行表示は現在入力中の2行目ではなく1行目で訂正する", () => {
+  const pending = [{ id: "only", text: "訂正前", createdAt: 1 }];
+  const revisions = planComposerRevisions("訂正後\n次の入力", pending);
+  assert.deepEqual(revisions.map((item) => [item.pending.id, item.text]), [["only", "訂正後"]]);
+});
+
+test("pendingが1件の3行表示は現在入力中の3行目ではなく2行目で訂正する", () => {
+  const pending = [{ id: "only", text: "二行目の訂正前", createdAt: 2 }];
+  const revisions = planComposerRevisions("一行目\n二行目の訂正後\n次の入力", pending);
+  assert.deepEqual(revisions.map((item) => [item.pending.id, item.text]), [["only", "二行目の訂正後"]]);
+});
+
+test("pendingが1件の1行表示は1行目で訂正する", () => {
+  const pending = [{ id: "only", text: "訂正前", createdAt: 1 }];
+  const revisions = planComposerRevisions("訂正後", pending);
+  assert.deepEqual(revisions.map((item) => [item.pending.id, item.text]), [["only", "訂正後"]]);
+});

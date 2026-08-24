@@ -59,7 +59,8 @@ export function planComposerRevisions(currentText, pending, isRevisionable = () 
   if (lines.length === 0 || candidates.length === 0) return [];
 
   if (candidates.length === 1) {
-    const line = lines.at(-1);
+    const rawLines = String(currentText).replace(/\r\n?/g, "\n").split("\n");
+    const line = rawLines.length === 1 ? rawLines[0].trim() : rawLines.at(-2)?.trim();
     return normalize(line) === normalize(candidates[0].text)
       ? []
       : [{ pending: candidates[0], text: line }];
