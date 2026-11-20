@@ -400,6 +400,7 @@ body.remote-mode-locked main { filter: saturate(0.65) opacity(0.72); }
 }
 .voice-terms pre {
   margin: 0;
+  max-width: 100%;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font: inherit;
@@ -799,10 +800,10 @@ body.tutorial-window-dragging * { cursor: grabbing !important; }
 }
 .tutorial-character-page { text-align: left; }
 .tutorial-character-page > p { max-width: 52ch; }
-.tutorial-character-credit { white-space: nowrap; }
 .tutorial-character-card {
   margin: 22px 0;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 6px;
   padding: 20px;
   border: 2px solid #b85f28;
@@ -811,30 +812,23 @@ body.tutorial-window-dragging * { cursor: grabbing !important; }
 }
 .tutorial-character-card strong { color: #762b0c; font-size: 1.5rem; }
 .tutorial-character-card span { color: #654839; }
-.tutorial-official-url { overflow-wrap: anywhere; }
-.tutorial-character-prohibitions { display: grid; gap: 7px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #d6ad8e; color: #5c3320; font-size: 0.82rem; line-height: 1.55; }
-.tutorial-character-prohibitions strong { font-size: 0.92rem; }
-.tutorial-character-prohibitions span { color: inherit; }
-.tutorial-character-prohibitions a,
-.tutorial-character-terms a { color: #7c3515; font-weight: 750; }
-.tutorial-license-summary { max-width: none !important; }
+.tutorial-character-card > hr {
+  margin: 12px 0 6px;
+  border: 0;
+  border-top: 1px solid #d6ad8e;
+}
 .tutorial-character-terms {
-  width: 100%;
-  max-width: none;
-  max-height: 310px;
-  overflow: auto;
-  margin: 18px 0;
-  padding: 16px;
-  border: 1px solid #d8c8ba;
-  border-radius: 14px;
-  background: #fffaf5;
-  color: #4f463f;
+  margin: 0;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+  color: #5c3320;
   font: inherit;
-  font-size: 0.84rem;
-  line-height: 1.65;
+  font-size: 0.82rem;
+  line-height: 1.55;
 }
+.tutorial-character-terms strong { font-size: 0.92rem; }
+.tutorial-character-terms a { color: #7c3515; font-weight: 750; }
+.tutorial-license-summary { max-width: none !important; }
 .tutorial-demo-button { min-height: 50px; margin-top: 12px; padding: 10px 16px; border: 1px solid #8d421d; border-radius: 14px; color: #fff; background: #9d4d24; font: inherit; font-weight: 800; cursor: pointer; }
 .tutorial-demo-button:disabled { opacity: 0.58; cursor: wait; }
 .tutorial-sample-row { margin-top: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
