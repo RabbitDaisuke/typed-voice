@@ -20,23 +20,27 @@
     .eyebrow { margin: 0 0 8px; color: #786f64; font-size: 0.74rem; font-weight: 750; letter-spacing: 0.08em; text-transform: uppercase; }
     h1 { margin: 0; font-size: clamp(2rem, 6vw, 3.3rem); letter-spacing: -0.045em; line-height: 1.05; }
     .lead { max-width: 72ch; margin: 16px 0 0; color: #625a51; line-height: 1.75; }
+    .important { margin: 24px 0 30px; padding: 18px 20px; border: 1px solid #e2c483; border-radius: 16px; background: #fff7e3; }
+    .important strong { display: block; margin-bottom: 6px; }
+    .important p { margin: 0; color: #6c551f; line-height: 1.65; }
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-    .card { padding: 20px; border: 1px solid #d9d2c9; border-radius: 18px; background: #fffdfa; box-shadow: 0 8px 28px #33291d0d; overflow-wrap: anywhere; }
+    .card { padding: 20px; border: 1px solid #d9d2c9; border-radius: 18px; background: #fffdfa; box-shadow: 0 8px 28px #33291d0d; }
+    .card.wide { grid-column: 1 / -1; }
     .card h2 { margin: 8px 0 10px; font-size: 1.12rem; }
-    .card h3 { margin: 16px 0 6px; font-size: 0.95rem; }
     .card p { margin: 0 0 10px; color: #625a51; line-height: 1.65; }
     .card p:last-child { margin-bottom: 0; }
+    .card > hr { margin: 18px 0; border: 0; border-top: 1px solid #d9d2c9; }
     .badge { display: inline-flex; align-items: center; min-height: 26px; padding: 3px 8px; border-radius: 999px; background: #ece7df; color: #5f574e; font-size: 0.7rem; font-weight: 750; }
     .badge.restricted { background: #fff0cd; color: #765716; }
     .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
     .links a { display: inline-flex; align-items: center; min-height: 38px; padding: 7px 10px; border: 1px solid #d9d2c9; border-radius: 10px; background: #faf8f4; text-decoration: none; font-size: 0.85rem; }
     .conditions { margin: 12px 0 0; padding-left: 1.2rem; color: #625a51; line-height: 1.7; }
-    .terms-full { margin-top: 14px; border: 1px solid #ded7cd; border-radius: 12px; background: #faf8f4; }
-    .terms-full summary { padding: 10px 12px; cursor: pointer; font-weight: 700; }
-    .terms-full pre { margin: 0; padding: 0 12px 12px; white-space: pre-wrap; overflow-wrap: anywhere; color: #5f584f; font: inherit; font-size: 0.82rem; line-height: 1.65; }
+    .common-terms h2 { margin: 0 0 12px; font-size: 1.2rem; }
+    .terms-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(8px, 2vw, 14px); }
+    .terms-grid .card { padding: clamp(10px, 2.5vw, 20px); }
+    .terms-grid pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: #5f584f; font: inherit; font-size: 0.9rem; line-height: 1.65; }
     .footer { margin-top: 28px; padding-top: 20px; border-top: 1px solid #d6cfc5; color: #756d63; font-size: 0.82rem; line-height: 1.65; }
-    .footer p { margin: 0 0 8px; }
-    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } .topbar { align-items: flex-start; flex-direction: column; } }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } .card.wide { grid-column: auto; } .topbar { align-items: flex-start; flex-direction: column; } }
   </style>
 </head>
 <body>
@@ -53,6 +57,38 @@
       <h1>ライセンス・利用条件</h1>
       <p class="lead">typed-voice本体のライセンスと、音声合成・英単語読み正規化に使用する第三者コンポーネントの条件をまとめています。このページは読みやすい概要です。法的に適用される正式な条件は、各項目から開ける同梱ライセンス本文・NOTICE・配布元の条件を確認してください。</p>
     </section>
+    <section class="common-terms" aria-labelledby="common-terms-title">
+      <h2 id="common-terms-title">共通利用規約</h2>
+      <div class="terms-grid">
+        <div class="card">
+          <pre>本ソフトウェアの音声合成には、フリー素材キャラクター「つくよみちゃん」（© Rei Yumesaki）が無料公開している音声データを使用しています。
+■つくよみちゃんコーパス（CV.夢前黎）
+<a href="https://tyc.rei-yumesaki.net/material/corpus/" target="_blank" rel="noopener noreferrer">https://tyc.rei-yumesaki.net/material/corpus/</a>
+■つくよみちゃん公式サイト
+<a href="https://tyc.rei-yumesaki.net" target="_blank" rel="noopener noreferrer">https://tyc.rei-yumesaki.net</a></pre>
+        </div>
+        <div class="card">
+          <pre><strong>【キャプチャ動画等を公開する際のルール】</strong>
+本ソフトウェアのキャプチャ動画、スクリーンショット、録音データ及びそれらに類するものを公開する場合は、本ソフトウェアの名称「typed-voice」またはURL「<a href="https://rabbitdaisuke.github.io/typed-voice/" target="_blank" rel="noopener noreferrer">https://rabbitdaisuke.github.io/typed-voice/</a>」をクレジットしてください。</pre>
+        </div>
+        <div class="card">
+          <pre>また、それらの動画・画像・音声等を次の目的で使用することを禁止します。
+■人を批判・攻撃すること。（「批判・攻撃」の定義は、つくよみちゃんキャラクターライセンス <a href="https://tyc.rei-yumesaki.net/about/terms/#condition3" target="_blank" rel="noopener noreferrer">https://tyc.rei-yumesaki.net/about/terms/#condition3</a> に準じます）
+■特定の政治的立場・宗教・思想への賛同または反対を呼びかけること。
+■刺激の強い表現をゾーニングなしで公開すること。
+■他者に対して二次利用を許可する形で公開すること。（出力した音声を素材として配布・販売する、出力した音声を用いて新たな音声合成ソフト類を作り他者に使用させるなど、つくよみちゃん（CV.夢前黎）の声質を他者が利用できるようにする行為全般を含みます）
+■typed-voice本体の利用規約に違反すること。</pre>
+        </div>
+        <div class="card">
+          <pre>・typed-voiceはブラウザアプリケーションとして実行する限り「つくよみちゃん」の利用規約に違反しない範囲でのあらゆるソフトウェアの自由な使用、私的複製、ダウンロード、実行、譲渡などを許可します。
+別途つくよみちゃんや、サイトパーティー音声エンジンの利用規約、ライセンスが適応されます。詳しくは<a href="https://rabbitdaisuke.github.io/typed-voice/licenses.html" target="_blank" rel="noopener noreferrer">https://rabbitdaisuke.github.io/typed-voice/licenses.html</a>をご覧ください。この文は、デバイス上に保存またはダウンロードされるモデル、ソースコード、上記つくよみちゃんの規約を上書きまたは置換するものではありません。</pre>
+        </div>
+      </div>
+    </section>
+    <aside class="important" aria-label="音声利用時の重要条件">
+      <strong>つくよみちゃんの声質を使った出力音声には、ソフトウェア本体とは別の利用条件があります。</strong>
+      <p>人への批判・攻撃、特定の政治的立場・宗教・思想への賛否を呼びかける用途、刺激の強い表現の無ゾーニング公開、他者へ素材として二次利用を許可する形での公開は禁止されています。下記「つくよみちゃん」の項目と公式条件を優先してください。</p>
+    </aside>
     <div class="grid">
       <section class="card">
         <span class="badge">Apache-2.0</span>
@@ -62,47 +98,29 @@
           <a href="./LICENSE.txt">Apache-2.0全文</a>
           <a href="./NOTICE.txt">NOTICE</a>
         </div>
-      </section>
-      <section class="card">
+        <hr>
         <span class="badge restricted">独自利用条件</span>
         <h2>つくよみちゃん / 音声コーパス</h2>
         <p>音声合成には「つくよみちゃんコーパス（CV.夢前黎）」（© Rei Yumesaki）由来の音声データを使用します。生成音声には、つくよみちゃん側の利用条件が別途適用されます。</p>
-        <details class="terms-full">
-          <summary>アプリ内の利用条件表示を全文確認</summary>
-          <pre>本ソフトウェアの音声合成には、フリー素材キャラクター「つくよみちゃん」（© Rei Yumesaki）が無料公開している音声データを使用しています。
-■つくよみちゃんコーパス（CV.夢前黎）
-<a href="https://tyc.rei-yumesaki.net/material/corpus/" target="_blank" rel="noopener noreferrer">https://tyc.rei-yumesaki.net/material/corpus/</a>
-■つくよみちゃん公式サイト
-<a href="https://tyc.rei-yumesaki.net" target="_blank" rel="noopener noreferrer">https://tyc.rei-yumesaki.net</a>
-<strong>【キャプチャ動画等を公開する際のルール】</strong>
-本ソフトウェアのキャプチャ動画、スクリーンショット、録音データ及びそれらに類するものを公開する場合は、本ソフトウェアの名称「typed-voice」またはURL「<a href="https://rabbitdaisuke.github.io/typed-voice/" target="_blank" rel="noopener noreferrer">https://rabbitdaisuke.github.io/typed-voice/</a>」をクレジットしてください。
-また、それらの動画・画像・音声等を次の目的で使用することを禁止します。
-■人を批判・攻撃すること。（「批判・攻撃」の定義は、つくよみちゃんキャラクターライセンス <a href="https://tyc.rei-yumesaki.net/about/terms/#condition3" target="_blank" rel="noopener noreferrer">https://tyc.rei-yumesaki.net/about/terms/#condition3</a> に準じます）
-■特定の政治的立場・宗教・思想への賛同または反対を呼びかけること。
-■刺激の強い表現をゾーニングなしで公開すること。
-■他者に対して二次利用を許可する形で公開すること。（出力した音声を素材として配布・販売する、出力した音声を用いて新たな音声合成ソフト類を作り他者に使用させるなど、つくよみちゃん（CV.夢前黎）の声質を他者が利用できるようにする行為全般を含みます）
-■typed-voice本体の利用規約に違反すること。
-
-・typed-voiceはブラウザアプリケーションとして実行する限り「つくよみちゃん」の利用規約に違反しない範囲でのあらゆるソフトウェアの自由な使用、私的複製、ダウンロード、実行、譲渡などを許可します。
-別途つくよみちゃんや、サイトパーティー音声エンジンの利用規約、ライセンスが適応されます。詳しくは<a href="https://rabbitdaisuke.github.io/typed-voice/licenses.html" target="_blank" rel="noopener noreferrer">https://rabbitdaisuke.github.io/typed-voice/licenses.html</a>をご覧ください。この文は、デバイス上に保存またはダウンロードされるモデル、ソースコード、上記つくよみちゃんの規約を上書きまたは置換するものではありません。</pre>
-        </details>
+        <ul class="conditions">
+          <li>人を批判・攻撃する用途は禁止。</li>
+          <li>特定の政治的立場・宗教・思想への賛同・反対を呼びかける用途は禁止。</li>
+          <li>刺激の強い表現は適切なゾーニングが必要。</li>
+          <li>生成音声を、他者が素材として二次利用できる形で公開することは禁止。</li>
+        </ul>
         <div class="links">
           <a href="https://tyc.rei-yumesaki.net/material/corpus/" rel="external">コーパス公式条件</a>
           <a href="https://tyc.rei-yumesaki.net/" rel="external">公式サイト</a>
         </div>
       </section>
       <section class="card">
-        <h2>音声エンジン・関連コード</h2>
-        <h3>Higgs Audio 2 / Meta Llama 3（Community License）</h3>
+        <span class="badge restricted">Community License</span>
+        <h2>Higgs Audio 2 / Meta Llama 3</h2>
         <p>OmniVoiceの音声デコーダーにはBoson Higgs Audio 2 Community License Agreementが適用され、同契約はMeta Llama 3 Community License Agreementを組み込みます。帰属、再配布、Acceptable Use等の条件はApache-2.0とは独立して適用されます。</p>
         <div class="links">
           <a href="./licenses/BOSON-HIGGS-AUDIO-2-LICENSE.txt">Higgs Audio 2全文</a>
           <a href="./licenses/META-LLAMA-3-LICENSE.txt">Meta Llama 3全文</a>
         </div>
-        <h3>VocoLoco（Apache-2.0）</h3>
-        <p>ブラウザ上のOmniVoice worker設計、duration estimationなどの実装アイデアはApache License 2.0のVocoLocoを参照・適応しています。詳細な由来は第三者NOTICEに記録しています。</p>
-        <h3>Piper Plus（旧実装）</h3>
-        <p>旧PoC由来のPiper Plusコードはリポジトリ内に残っていますが、現在のOmniVoice PoCでは選択可能な音声エンジンとして公開していません。該当コードにはそれぞれの上流ライセンスが適用されます。</p>
       </section>
       <section class="card">
         <span class="badge">MIT</span>
@@ -122,11 +140,26 @@
           <a href="https://huggingface.co/datasets/VOICEVOX/kanalizer-dataset" rel="external">データセット配布元</a>
         </div>
       </section>
+      <section class="card">
+        <span class="badge">Apache-2.0</span>
+        <h2>VocoLoco</h2>
+        <p>ブラウザ上のOmniVoice worker設計、duration estimationなどの実装アイデアはApache License 2.0のVocoLocoを参照・適応しています。詳細な由来は第三者NOTICEに記録しています。</p>
+      </section>
+      <section class="card">
+        <span class="badge">Legacy</span>
+        <h2>Piper Plus</h2>
+        <p>旧PoC由来のPiper Plusコードはリポジトリ内に残っていますが、現在のOmniVoice PoCでは選択可能な音声エンジンとして公開していません。該当コードにはそれぞれの上流ライセンスが適用されます。</p>
+      </section>
+      <section class="card wide">
+        <span class="badge">監査用詳細</span>
+        <h2>第三者NOTICE</h2>
+        <p>使用コンポーネントのrevision、モデルの扱い、帰属関係など、実装監査向けの詳細は第三者NOTICEにまとめています。</p>
+        <div class="links">
+          <a href="./THIRD_PARTY_NOTICES.md">THIRD_PARTY_NOTICES.mdを開く</a>
+        </div>
+      </section>
     </div>
-    <footer class="footer">
-      <p>使用コンポーネントのrevision、モデルの扱い、帰属関係などの詳細は <a href="./THIRD_PARTY_NOTICES.md">第三者NOTICE</a> をご覧ください。</p>
-      <p>このページは、同梱ライセンス本文や各権利者が公開する正式な利用条件を変更するものではありません。</p>
-    </footer>
+    <footer class="footer">このページは条件の要約であり、同梱ライセンス本文や各権利者が公開する正式な利用条件を変更するものではありません。</footer>
   </main>
 </body>
 </html>
