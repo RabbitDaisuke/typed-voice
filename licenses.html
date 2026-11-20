@@ -29,7 +29,7 @@
     .card h2 { margin: 8px 0 10px; font-size: 1.12rem; }
     .card p { margin: 0 0 10px; color: #625a51; line-height: 1.65; }
     .card p:last-child { margin-bottom: 0; }
-    .card > hr { margin: 18px 0; border: 0; border-top: 1px solid #d9d2c9; }
+    .card.app-license { align-self: start; }
     .badge { display: inline-flex; align-items: center; min-height: 26px; padding: 3px 8px; border-radius: 999px; background: #ece7df; color: #5f574e; font-size: 0.7rem; font-weight: 750; }
     .badge.restricted { background: #fff0cd; color: #765716; }
     .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
@@ -83,27 +83,13 @@
       <p>人への批判・攻撃、特定の政治的立場・宗教・思想への賛否を呼びかける用途、刺激の強い表現の無ゾーニング公開、他者へ素材として二次利用を許可する形での公開は禁止されています。下記「つくよみちゃん」の項目と公式条件を優先してください。</p>
     </aside>
     <div class="grid">
-      <section class="card">
+      <section class="card app-license">
         <span class="badge">Apache-2.0</span>
         <h2>typed-voice 本体</h2>
         <p>本プロジェクトが独自に作成したソースコードはApache License 2.0です。このライセンスは、モデル重み・音声コーパス・第三者コードを上書きしません。</p>
         <div class="links">
           <a href="./LICENSE.txt">Apache-2.0全文</a>
           <a href="./NOTICE.txt">NOTICE</a>
-        </div>
-        <hr>
-        <span class="badge restricted">独自利用条件</span>
-        <h2>つくよみちゃん / 音声コーパス</h2>
-        <p>音声合成には「つくよみちゃんコーパス（CV.夢前黎）」（© Rei Yumesaki）由来の音声データを使用します。生成音声には、つくよみちゃん側の利用条件が別途適用されます。</p>
-        <ul class="conditions">
-          <li>人を批判・攻撃する用途は禁止。</li>
-          <li>特定の政治的立場・宗教・思想への賛同・反対を呼びかける用途は禁止。</li>
-          <li>刺激の強い表現は適切なゾーニングが必要。</li>
-          <li>生成音声を、他者が素材として二次利用できる形で公開することは禁止。</li>
-        </ul>
-        <div class="links">
-          <a href="https://tyc.rei-yumesaki.net/material/corpus/" rel="external">コーパス公式条件</a>
-          <a href="https://tyc.rei-yumesaki.net/" rel="external">公式サイト</a>
         </div>
       </section>
       <section class="card">
