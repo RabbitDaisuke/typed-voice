@@ -78,12 +78,16 @@ textarea {
   resize: vertical;
 }
 
-.normalizer-poc {
-  margin: 0 0 20px;
+.normalizer-poc,
+.voice-terms {
   padding: 14px;
   border: 1px solid #d8d0c5;
   border-radius: 14px;
   background: #fff;
+}
+
+.normalizer-poc {
+  margin: 0 0 20px;
 }
 
 .normalizer-toggle {
@@ -132,14 +136,10 @@ textarea {
 }
 
 .voice-terms {
-  margin-top: 12px;
-  padding: 12px 14px;
-  border: 1px solid #d8d0c5;
-  border-radius: 14px;
-  background: #faf8f4;
+  margin-top: 16px;
   color: #5f584f;
-  font-size: 0.78rem;
-  line-height: 1.55;
+  font-size: 0.9rem;
+  line-height: 1.6;
 }
 
 .voice-terms pre {
