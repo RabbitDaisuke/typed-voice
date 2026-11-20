@@ -36,8 +36,7 @@
     .links a { display: inline-flex; align-items: center; min-height: 38px; padding: 7px 10px; border: 1px solid #d9d2c9; border-radius: 10px; background: #faf8f4; text-decoration: none; font-size: 0.85rem; }
     .conditions { margin: 12px 0 0; padding-left: 1.2rem; color: #625a51; line-height: 1.7; }
     .common-terms h2 { margin: 0 0 12px; font-size: 1.2rem; }
-    .terms-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(8px, 2vw, 14px); }
-    .terms-grid .card { padding: clamp(10px, 2.5vw, 20px); }
+    .terms-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(14px, 2.5vw, 24px) clamp(12px, 3vw, 28px); padding: clamp(10px, 2.5vw, 20px); }
     .terms-grid pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: #5f584f; font: inherit; font-size: 0.9rem; line-height: 1.65; }
     .footer { margin-top: 28px; padding-top: 20px; border-top: 1px solid #d6cfc5; color: #756d63; font-size: 0.82rem; line-height: 1.65; }
     @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } .card.wide { grid-column: auto; } .topbar { align-items: flex-start; flex-direction: column; } }
@@ -59,30 +58,22 @@
     </section>
     <section class="common-terms" aria-labelledby="common-terms-title">
       <h2 id="common-terms-title">共通利用規約</h2>
-      <div class="terms-grid">
-        <div class="card">
-          <pre>本ソフトウェアの音声合成には、フリー素材キャラクター「つくよみちゃん」（© Rei Yumesaki）が無料公開している音声データを使用しています。
+      <div class="card terms-grid">
+        <pre>本ソフトウェアの音声合成には、フリー素材キャラクター「つくよみちゃん」（© Rei Yumesaki）が無料公開している音声データを使用しています。
 ■つくよみちゃんコーパス（CV.夢前黎）
 <a href="https://tyc.rei-yumesaki.net/material/corpus/" target="_blank" rel="noopener noreferrer">https://tyc.rei-yumesaki.net/material/corpus/</a>
 ■つくよみちゃん公式サイト
 <a href="https://tyc.rei-yumesaki.net" target="_blank" rel="noopener noreferrer">https://tyc.rei-yumesaki.net</a></pre>
-        </div>
-        <div class="card">
-          <pre><strong>【キャプチャ動画等を公開する際のルール】</strong>
+        <pre><strong>【キャプチャ動画等を公開する際のルール】</strong>
 本ソフトウェアのキャプチャ動画、スクリーンショット、録音データ及びそれらに類するものを公開する場合は、本ソフトウェアの名称「typed-voice」またはURL「<a href="https://rabbitdaisuke.github.io/typed-voice/" target="_blank" rel="noopener noreferrer">https://rabbitdaisuke.github.io/typed-voice/</a>」をクレジットしてください。</pre>
-        </div>
-        <div class="card">
-          <pre>また、それらの動画・画像・音声等を次の目的で使用することを禁止します。
+        <pre>また、それらの動画・画像・音声等を次の目的で使用することを禁止します。
 ■人を批判・攻撃すること。（「批判・攻撃」の定義は、つくよみちゃんキャラクターライセンス <a href="https://tyc.rei-yumesaki.net/about/terms/#condition3" target="_blank" rel="noopener noreferrer">https://tyc.rei-yumesaki.net/about/terms/#condition3</a> に準じます）
 ■特定の政治的立場・宗教・思想への賛同または反対を呼びかけること。
 ■刺激の強い表現をゾーニングなしで公開すること。
 ■他者に対して二次利用を許可する形で公開すること。（出力した音声を素材として配布・販売する、出力した音声を用いて新たな音声合成ソフト類を作り他者に使用させるなど、つくよみちゃん（CV.夢前黎）の声質を他者が利用できるようにする行為全般を含みます）
 ■typed-voice本体の利用規約に違反すること。</pre>
-        </div>
-        <div class="card">
-          <pre>■typed-voiceはブラウザアプリケーションとして実行する限り「つくよみちゃん」の利用規約に違反しない範囲でのあらゆるソフトウェアの自由な使用、私的複製、ダウンロード、実行、譲渡などを許可します。
+        <pre>■typed-voiceはブラウザアプリケーションとして実行する限り「つくよみちゃん」の利用規約に違反しない範囲でのあらゆるソフトウェアの自由な使用、私的複製、ダウンロード、実行、譲渡などを許可します。
 別途つくよみちゃんや、サイトパーティー音声エンジンの利用規約、ライセンスが適応されます。詳しくは<a href="https://rabbitdaisuke.github.io/typed-voice/licenses.html" target="_blank" rel="noopener noreferrer">https://rabbitdaisuke.github.io/typed-voice/licenses.html</a>をご覧ください。この文は、デバイス上に保存またはダウンロードされるモデル、ソースコード、上記つくよみちゃんの規約を上書きまたは置換するものではありません。</pre>
-        </div>
       </div>
     </section>
     <aside class="important" aria-label="音声利用時の重要条件">
